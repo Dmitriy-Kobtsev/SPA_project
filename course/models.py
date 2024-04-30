@@ -28,3 +28,5 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = 'урок'
         verbose_name_plural = 'уроки'
+
+class Payments(models.Model):
