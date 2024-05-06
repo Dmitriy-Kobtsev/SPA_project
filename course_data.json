@@ -1,7 +1,15 @@
 [
+    {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "email": "user_1@mail.ru",
+      "city": "Spb"
+    }
+  },
   {
     "model": "course.course",
-    "pk": 2,
+    "pk": 1,
     "fields": {
       "name": "OOP",
       "img": "",
@@ -10,7 +18,7 @@
   },
   {
     "model": "course.course",
-    "pk": 4,
+    "pk": 2,
     "fields": {
       "name": "FP-2",
       "img": "",
@@ -19,31 +27,42 @@
   },
   {
     "model": "course.lesson",
-    "pk": 2,
+    "pk": 1,
     "fields": {
       "name": "OOP_1",
       "description": null,
       "img": "",
       "video": "",
-      "course": 2
+      "course": 1
+    }
+  },
+  {
+    "model": "course.lesson",
+    "pk": 2,
+    "fields": {
+      "name": "OOP_2",
+      "description": null,
+      "img": "",
+      "video": "",
+      "course": 1
     }
   },
   {
     "model": "course.lesson",
     "pk": 3,
     "fields": {
-      "name": "OOP_2",
+      "name": "OOP_3",
       "description": null,
       "img": "",
       "video": "",
-      "course": 2
+      "course": 1
     }
   },
   {
     "model": "course.lesson",
     "pk": 4,
     "fields": {
-      "name": "OOP_3",
+      "name": "function",
       "description": null,
       "img": "",
       "video": "",
@@ -51,24 +70,12 @@
     }
   },
   {
-    "model": "course.lesson",
-    "pk": 5,
-    "fields": {
-      "name": "function",
-      "description": null,
-      "img": "",
-      "video": "",
-      "course": null
-    }
-  },
-  {
     "model": "course.payments",
-    "pk": 1,
     "fields": {
       "user": 1,
       "date_pay": "2024-05-03",
       "paid_lesson": null,
-      "paid_course": 2,
+      "paid_course": 1,
       "payment_amount": 2000.0,
       "payment_method": "Transfer"
     }
@@ -79,7 +86,7 @@
       "user": 1,
       "date_pay": "2024-04-03",
       "paid_lesson": null,
-      "paid_course": 4,
+      "paid_course": 2,
       "payment_amount": 2000.0,
       "payment_method": "Transfer"
     }
