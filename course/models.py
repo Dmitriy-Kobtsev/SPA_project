@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from users.models import User
+
 
 class Course(models.Model):
     name = models.CharField(max_length=150, verbose_name='Курс')
     img = models.ImageField(upload_to='course/', verbose_name='Превью(картинка)', null=True, blank=True)
     description = models.TextField(verbose_name='Описание', null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='автор курса')
 
     def __str__(self):
         # Строковое отображение объекта
@@ -22,6 +25,7 @@ class Lesson(models.Model):
     img = models.ImageField(upload_to='course/lessons', verbose_name='превью (картинка)', null=True, blank=True)
     video = models.FileField(upload_to='lessons/video', verbose_name='видео', null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс', null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='автор')
 
     def __str__(self):
         return f'Урок {self.name}'
