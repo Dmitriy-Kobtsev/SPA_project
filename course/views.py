@@ -1,27 +1,31 @@
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     RetrieveAPIView,
     UpdateAPIView,
-    DestroyAPIView,
+    DestroyAPIView, get_object_or_404,
 )
 
-from course.models import Course, Lesson, Payments
+from course.models import Course, Lesson, Payments, Subscription
+from course.paginations import CustomPagination
 from course.serializers import (
     CourseSerializer,
     LessonSerializer,
     CourseDetailSerializer,
-    PaymentsSerializer,
+    PaymentsSerializer, SubscriptionSerializer,
 )
 from users.permissions import IsModer, IsOwner
 
 
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -53,6 +57,7 @@ class LessonCreateAPIView(CreateAPIView):
 class LessonListAPIView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    pagination_class = CustomPagination
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
@@ -79,3 +84,21 @@ class PaymentsListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("date_pay",)
+
+
+class SubscriptionAPIView(APIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+    def post(self, *args, **kwargs):
+        user = self.request.user
+        course_id = self.request.data.get('course')
+        course_item = get_object_or_404(Course, pk=course_id)
+
+        if Subscription.objects.filter(user=user, course=course_item).exists():
+            Subscription.objects.filter(user=user, course=course_item).delete()
+            message = "подписка удалена"
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = "подписка добавлена"
+        return Response({"message": message})
