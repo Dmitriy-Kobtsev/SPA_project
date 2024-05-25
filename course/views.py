@@ -20,6 +20,7 @@ from course.serializers import (
     CourseDetailSerializer,
     PaymentsSerializer, SubscriptionSerializer,
 )
+from course.services import create_stripe_product, create_stripe_price, create_stripe_session
 from users.permissions import IsModer, IsOwner
 
 
@@ -84,6 +85,20 @@ class PaymentsListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ("paid_course", "paid_lesson", "payment_method")
     ordering_fields = ("date_pay",)
+
+
+class PaymentsCreateAPIView(CreateAPIView):
+    queryset = Payments.objects.all()
+    serializer_class = PaymentsSerializer
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        product = create_stripe_product(payment.paid_course)
+        price = create_stripe_price(product, payment.payment_amount)
+        session_id, session_link = create_stripe_session(price)
+        payment.session_id = session_id
+        payment.link = session_link
+        payment.save()
 
 
 class SubscriptionAPIView(APIView):

@@ -9,7 +9,7 @@ from course.views import (
     LessonDestroyAPIView,
     LessonUpdateAPIView,
     PaymentsListAPIView,
-    SubscriptionAPIView,
+    SubscriptionAPIView, PaymentsCreateAPIView,
 )
 from course.apps import CourseConfig
 
@@ -41,6 +41,7 @@ urlpatterns = [
         name="lessons_update"
     ),
     path("payments/", PaymentsListAPIView.as_view(), name="payments"),
+    path("payments/create/", PaymentsCreateAPIView.as_view(), name="payments_create"),
     path("subscription/", SubscriptionAPIView.as_view(), name="subscription"),
 ]
 
