@@ -102,7 +102,7 @@ class Payments(models.Model):
         null=True,
         blank=True,
     )
-    payment_amount = models.FloatField(verbose_name="сумма оплаты")
+    payment_amount = models.PositiveIntegerField(verbose_name="сумма оплаты")
     CHOICES = (
         ("1", "Cash"),
         ("2", "Transfer"),
@@ -110,6 +110,20 @@ class Payments(models.Model):
     payment_method = models.CharField(
         max_length=300,
         choices=CHOICES
+    )
+    session_id = models.CharField(
+        max_length=255,
+        verbose_name="Id сессии",
+        help_text="Укажите id сессии",
+        null=True,
+        blank=True,
+    )
+    link = models.URLField(
+        max_length=400,
+        verbose_name="Ссылка на оплату",
+        help_text="Укажите ссылку на оплату",
+        null=True,
+        blank=True
     )
 
     def __str__(self):
@@ -134,7 +148,6 @@ class Subscription(models.Model):
         null=True,
         blank=True,
     )
-
 
     class Meta:
         verbose_name = "подписка"
