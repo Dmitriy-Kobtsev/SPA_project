@@ -23,6 +23,13 @@ class Course(models.Model):
         blank=True,
         verbose_name="автор курса",
     )
+    followers = models.ManyToManyField(
+        User,
+        verbose_name="Подписчики",
+        related_name="user_followers",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         # Строковое отображение объекта
