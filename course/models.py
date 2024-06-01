@@ -14,14 +14,21 @@ class Course(models.Model):
     )
     description = models.TextField(
         verbose_name="Описание",
-        null=True, blank=True
+        null=True,
+        blank=True
     )
     owner = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="автор курса",
+        verbose_name="автор курса"
+    )
+    followers = models.ManyToManyField(
+        User,
+        verbose_name="Подписчики",
+        related_name="course_followers",
+        blank=True
     )
 
     def __str__(self):

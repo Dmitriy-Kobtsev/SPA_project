@@ -1,3 +1,4 @@
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +22,7 @@ from course.serializers import (
     PaymentsSerializer, SubscriptionSerializer,
 )
 from course.services import create_stripe_product, create_stripe_price, create_stripe_session
+from course.tasks import send_information_about_update_course
 from users.permissions import IsModer, IsOwner
 
 
@@ -44,6 +46,18 @@ class CourseViewSet(ModelViewSet):
         elif self.action == "destroy":
             self.permission_classes = (~IsModer | IsOwner,)
         return super().get_permissions()
+
+    def update(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        for follower in course.followers.all():
+            send_information_about_update_course.delay(follower.email, course.name, )
+        return super().update(request)
+
+    def partial_update(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        for follower in course.followers.all():
+            send_information_about_update_course.delay(follower.email, course.name, )
+        return super().partial_update(request)
 
 
 class LessonCreateAPIView(CreateAPIView):
@@ -111,9 +125,11 @@ class SubscriptionAPIView(APIView):
         course_item = get_object_or_404(Course, pk=course_id)
 
         if Subscription.objects.filter(user=user, course=course_item).exists():
+            course_item.followers.remove(user)
             Subscription.objects.filter(user=user, course=course_item).delete()
             message = "подписка удалена"
         else:
             Subscription.objects.create(user=user, course=course_item)
+            course_item.followers.add(user)
             message = "подписка добавлена"
         return Response({"message": message})

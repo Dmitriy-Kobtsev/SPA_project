@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+from _pydatetime import timedelta
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework_simplejwt",
+    "django_celery_beat",
     "django_filters",
     "rest_framework",
     "drf_yasg",
@@ -148,4 +151,38 @@ REST_FRAMEWORK = {
     ],
 }
 
+SIMPLE_JWT = {
+    'UPDATE_LAST_LOGIN': True,
+}
+
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+
+# Celery Configuration Options
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+# Celery Beat settings
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "block_user": {
+        "task": "course.tasks.block_user",
+        "schedule": timedelta(days=1),
+    },
+}
