@@ -22,7 +22,7 @@ from course.serializers import (
     PaymentsSerializer, SubscriptionSerializer,
 )
 from course.services import create_stripe_product, create_stripe_price, create_stripe_session
-from course.tasks import add
+from course.tasks import send_information_about_update_course
 from users.permissions import IsModer, IsOwner
 
 
@@ -47,13 +47,17 @@ class CourseViewSet(ModelViewSet):
             self.permission_classes = (~IsModer | IsOwner,)
         return super().get_permissions()
 
-    def update(self, request, *args, **kwargs):
-        add.delay()
-        return super().update(request, *args, **kwargs)
+    def update(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        for follower in course.followers.all():
+            send_information_about_update_course.delay(follower.email, course.name, )
+        return super().update(request)
 
-    def partial_update(self, request, *args, **kwargs):
-        add.delay()
-        return super().partial_update(request, *args, **kwargs)
+    def partial_update(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        for follower in course.followers.all():
+            send_information_about_update_course.delay(follower.email, course.name, )
+        return super().partial_update(request)
 
 
 class LessonCreateAPIView(CreateAPIView):
