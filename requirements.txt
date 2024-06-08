@@ -32,7 +32,6 @@ pathspec==0.12.1
 pillow==10.3.0
 platformdirs==4.2.1
 prompt-toolkit==3.0.43
-psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pycodestyle==2.11.1
 pyflakes==3.2.0
